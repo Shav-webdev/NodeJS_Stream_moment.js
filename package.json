@@ -1,0 +1,14 @@
+{
+  "name": "node_stream",
+  "version": "1.0.0",
+  "description": "work_with_node_stream",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "moment": "^2.24.0"
+  }
+}
