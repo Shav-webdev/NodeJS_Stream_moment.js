@@ -9,7 +9,7 @@ const moment = require("moment");
 class MyWritableStream extends Writable {
     constructor(sPath) {
         super();
-        this.wStream = fs.createWriteStream(`${sPath}`)
+        this.wStream = fs.createWriteStream(`${sPath}`);
         this.counter = 0;
     }
     _write(chunk, enc, next) {
@@ -18,7 +18,6 @@ class MyWritableStream extends Writable {
         } else {
             setInterval(() => {
                 ++this.counter;
-                console.log(this.counter)
                 this.wStream.write(`${this.counter}: ${chunk} ${moment().format('MMMM Do YYYY, h:mm:ss a')} \n`);
             }, 1000);
         }
@@ -31,7 +30,7 @@ const ws = new MyWritableStream("./text.txt");
 
 ws._write("now", "utf8", function (err) {
     if (err){
-        console.log("err", err.message)
+        console.log("err", err.message);
     }
 });
 
