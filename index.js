@@ -34,7 +34,7 @@ ws._write("now", "utf8", function (err) {
     }
 });
 
-fs.createReadStream("./text.txt").pipe(ws);
+fs.createReadStream("./text.txt", "utf8").pipe(ws);
 
 
 
