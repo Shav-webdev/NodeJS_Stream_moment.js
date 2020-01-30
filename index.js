@@ -1,37 +1,62 @@
-const {Writable} = require("stream");
+const {Writable, Readable, Transform} = require("stream");
 const fs = require("fs");
 const moment = require("moment");
 
 /**
- * @method _write of @class MyWritableStream write to a stream every second
- * the current time formatted using moment.js and write that stream to the file*/
+ * @method_read of @class MyReadableStream push to stream current time in every second*/
 
-class MyWritableStream extends Writable {
-    constructor(sPath) {
+class MyReadableStream extends Readable {
+    constructor() {
         super();
-        this.wStream = fs.createWriteStream(`${sPath}`);
         this.counter = 0;
     }
-    _write(chunk, enc, next) {
-        if (chunk.length === 0) {
-            next(new Error('empty chunk detected'));
-        } else {
-            setInterval(() => {
+
+    _read() {
+        setTimeout(() => {
+            if (this.counter < 150) {
+                this.push(`${this.counter}. ${moment().format('MMMM Do YYYY, h:mm:ss a')}`);
                 ++this.counter;
-                this.wStream.write(`${this.counter}: ${chunk} ${moment().format('MMMM Do YYYY, h:mm:ss a')} \n`);
-            }, 1000);
-        }
+            }
+        }, 1000)
+    }
+}
+
+/**
+ * @method_transform of @class MyTransformStream added Yerevan time zone to chunk*/
+
+class MyTransformStream extends Transform {
+    _transform(chunk, encoding, callback) {
+        this.push(`Time in Yerevan is now  ${chunk} \n`, "utf8");
+        callback();
+    }
+}
+
+/**
+ * @method_write of @class MyWriteableStream write to the file **/
+
+class MyWriteableStream extends Writable {
+    constructor() {
+        super();
+        this.counter = 0;
+        this.writeStream = fs.createWriteStream("./text.txt", "utf8")
+    }
+
+    _write(chunk, encoding, next) {
+        this.writeStream.write(
+            ` ${chunk} `,
+            "utf8",
+            function (err) {
+                if (err) {
+                    console.log(err.message);
+                }
+            });
         next();
     }
 }
 
-const ws = new MyWritableStream("./text.txt");
+const rs = new MyReadableStream();
+const ws = new MyWriteableStream();
+const ts = new MyTransformStream();
 
+rs.pipe(ts).pipe(ws);
 
-ws._write("now", "utf8", function (err) {
-    if (err){
-        console.log("err", err.message);
-    }
-});
-
-fs.createReadStream("./text.txt", "utf8").pipe(ws);
